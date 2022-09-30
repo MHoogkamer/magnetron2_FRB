@@ -332,6 +332,29 @@ def main(filename, dnest_dir = "./", levelfilename=None, nsims=100):
 
     return
 
+### NOT FINISHED YET ###
+def run_all_bursts(data_dir="/home/mariska/UvA/magnetron2/data/", dnest_dir="./", levelfilename="test_levels.dat"):
+
+    print("I am in run_all_bursts")
+
+    # Run all the burst by running all the files that end with .dat
+    filenames = glob.glob("%s*_data.dat"%data_dir)
+    print(filenames)
+
+    levelfilename = data_dir+levelfilename
+    print("Saving levels in file %s"%levelfilename)
+
+    levelfile = open(levelfilename, "w")
+    levelfile.write("# data filename \t number of levels \n")
+    levelfile.close()
+
+    for f in filenames:
+        print("Running on burst %s" %f)
+        run_burst(f, dnest_dir=dnest_dir, levelfilename=levelfilename) ## Now called main()
+
+    return
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Running DNest on a number of bursts")
 
