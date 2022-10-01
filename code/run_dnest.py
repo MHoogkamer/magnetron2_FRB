@@ -208,7 +208,7 @@ def find_weights(p_samples):
         print("Returning False")
         return False
 
-def main(filename, dnest_dir = "./", levelfilename=None, nsims=100):
+def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
     '''' Automatically runs the DNest4 for the given filename without having
     to put the correct commands in the command line. Also finds the correct 
     amount of levels by running DNest4 twice. 
@@ -317,11 +317,11 @@ def main(filename, dnest_dir = "./", levelfilename=None, nsims=100):
 
     # Move all the output to ...? 
     # Change the filenames so that it includes the filename(?)
-    shutil.move("sample.txt", "%s_sample.txt" %froot)
     try:
         shutil.move("posterior_sample.txt", "%s_posterior_sample.txt" %froot)
         shutil.move("levels.txt", "%s_levels.txt" %froot)
         shutil.move("sample_info.txt", "%s_sample_info.txt" %froot)
+        shutil.move("sample.txt", "%s_sample.txt" %froot)
         shutil.move("weights.txt", "%s_weights.txt" %froot)
         shutil.move("log_prior_weights.txt", "%s_log_prior_weights.txt" %froot) # added 
         shutil.move("main", "%s_main" %froot) # added 
@@ -336,9 +336,8 @@ def main(filename, dnest_dir = "./", levelfilename=None, nsims=100):
 def run_all_bursts(data_dir="/home/mariska/UvA/magnetron2/data/", dnest_dir="./", levelfilename="test_levels.dat"):
 
     print("I am in run_all_bursts")
-
-    # Run all the burst by running all the files that end with .dat
-    filenames = glob.glob("%s*_data.dat"%data_dir)
+    # Run all the burst by running all the files that end with _test.dat
+    filenames = glob.glob("%s*_test.dat"%data_dir)
     print(filenames)
 
     levelfilename = data_dir+levelfilename
@@ -350,12 +349,35 @@ def run_all_bursts(data_dir="/home/mariska/UvA/magnetron2/data/", dnest_dir="./"
 
     for f in filenames:
         print("Running on burst %s" %f)
-        run_burst(f, dnest_dir=dnest_dir, levelfilename=levelfilename) ## Now called main()
+        run_burst(f, dnest_dir=dnest_dir, levelfilename=levelfilename) 
 
+    return
+
+def main():
+    print("I am in main")
+    run_all_bursts(data_dir, dnest_dir, levelfilename)
     return
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Running DNest on a number of bursts")
 
-    main(filename = "/home/mariska/UvA/magnetron2/data/B3_Jan14_test.dat")
+    parser.add_argument("-d", "--datadir", action="store", required=False, dest="data_dir",
+                        default="/home/mariska/UvA/magnetron2/data/", help="Specify directory with data files (default: current directory)")
+    parser.add_argument("-n", "--dnestdir", action="store", required=False, dest="dnest_dir",
+                        default="./", help="Specify directory with DNest model implementation "
+                                           "(default: current directory")
+    parser.add_argument("-f", "--filename", action="store", required=False, dest="filename",
+                        default="test_levels.dat", help="Define filename for file that saves the number of levels to use")
+
+    clargs = parser.parse_args()
+    data_dir = clargs.data_dir
+    dnest_dir = clargs.dnest_dir
+    levelfilename = clargs.filename
+
+    main()
+
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser(description="Running DNest on a number of bursts")
+
+#     main(filename = "/home/mariska/UvA/magnetron2/data/B3_Jan14_test.dat")
