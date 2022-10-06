@@ -349,7 +349,7 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
     # Kill DNest4 when endflag is true: this is now the case when ...?
     dnest_process.kill()
      
-    logx_samples, p_samples = postprocess_new(save_posterior=True)    
+    # logx_samples, p_samples = postprocess_new(save_posterior=True)    
 
     fsplit = filename.split("_")
     #froot = "%s_%s" %(fsplit[0], fsplit[1])
