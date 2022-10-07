@@ -121,8 +121,7 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
         try:
             # every minute the plots pop up showing the log(x), iterations, etc. 
             tsys.sleep(60)
-            logx_samples, p_samples = dnest4.postprocess(plot=False) # used to be postprocess_new
-            # logx_samples, p_samples = postprocess_new(save_posterior=False)
+            logx_samples, p_samples = dnest4.postprocess(plot=False) 
             if p_samples is None:
                 endflag = False
             else:
@@ -138,7 +137,6 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
     # Kill DNest4 when endflag is true: when weights are found 
     dnest_process.kill()
 
-    ### CHECK FROM HERE ON: ##########
     dnest_data = np.loadtxt("%ssample.txt" %dnest_dir)
     nlevels = len(dnest_data)
 
@@ -149,7 +147,7 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
         levelfile.close()
 
     # Rerun DNest4 again, but now with the correct amount of levels calculated previously
-    # For that rewrite the options file and the model(?)
+    # In order to do that rewrite the options file and recompile
     rewrite_options(nlevels=nlevels, dnest_dir=dnest_dir)
     remake_model(dnest_dir)
 
@@ -159,14 +157,13 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
     while endflag is False:
         try:
             tsys.sleep(120)
-            logx_samples, p_samples = dnest4.postprocess(plot=False) # used to be postprocess_new
+            logx_samples, p_samples = dnest4.postprocess(plot=False) 
             samples = np.loadtxt("%sposterior_sample.txt"%dnest_dir)
             print("samples file: %ssample.txt" %dnest_dir)
             print("nlevels: %i" %len(samples)) 
             print("Endflag: " + str(endflag))
 
             if len(samples) >= nsims and len(np.shape(samples)) > 1: 
-            #if len(samples) >= np.max([5*nlevels, 1000+nlevels]) and len(np.shape(samples)) > 1:
                 endflag = True
             else:
                 endflag = False
@@ -178,10 +175,7 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
     # Kill DNest4 when endflag is true: this is now the case when ...?
     dnest_process.kill()
 
-    # logx_samples, p_samples = dnest4.postprocess(plot=False)  ##### DONT NEED IT??  
-    # logx_samples, p_samples = postprocess_new(save_posterior=True)    
-
-    # Change the filenames so that it includes the filename
+    # Change the outputfilenames so that it includes the filename
     try:
         shutil.move("posterior_sample.txt", "%s_posterior_sample.txt" %froot)
         shutil.move("levels.txt", "%s_levels.txt" %froot)
@@ -197,11 +191,10 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
 
     return
 
-### NOT FINISHED YET ###
 def run_all_bursts(data_dir="/home/mariska/UvA/magnetron2/data/", dnest_dir="./", levelfilename="test_levels.dat"):
 
     print("I am in run_all_bursts")
-    # Run all the burst by running all the files that end with _test.dat
+    # Run all the burst by running all the files that end with .dat
     filenames = glob.glob("%s*.dat"%data_dir) ### NOTE: This has to be correct otherwise it doesn't work!
     print(filenames)
 
@@ -241,8 +234,3 @@ if __name__ == "__main__":
     levelfilename = clargs.filename
 
     main()
-
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser(description="Running DNest on a number of bursts")
-
-#     main(filename = "/home/mariska/UvA/magnetron2/data/FRB20180725A_waterfall2.dat")
