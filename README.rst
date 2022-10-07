@@ -7,10 +7,10 @@ Magnetron is a code to model one-dimensional data (e.g. time series)
 with a superposition of simple shapes. The number of components in the 
 superposition is part of the model and need not be known beforehand.
 
-Note that this version of magnetron2 uses a **Poisson Likelihood**, since it 
-was originally written for X-ray data of magnetar bursts. For a version that 
-works on data with normally distributed uncertainties (like optical or radio 
-data of, say blazars), check out ongoing work in the `blazars` branch!
+Magnetron2 originally used a **Poisson Likelihood**, since it 
+was written for X-ray data of magnetar bursts. This version is adjusted from the
+so that it works for fast radio bursts (FRBs) which is data that has 
+normally distributed uncertainties. 
 
 Dependencies
 ============
