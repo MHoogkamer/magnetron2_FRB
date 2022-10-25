@@ -85,7 +85,7 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
     nsims: minimum amount of samples you want
     '''
 
-    ### first run: set levels to 200
+    ### first run: set levels to 300
     # automatically runs the functions above
     print("Rewriting DNest run file (main.cpp)")
     rewrite_main(filename, dnest_dir)
@@ -103,7 +103,7 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
     fsplit = fname.split("_")
         
     # make a seperate folder to put in the output for each filename 
-    fdir_out = "/home/mariska/UvA/magnetron2/output_test"
+    fdir_out = "/home/mariska/UvA/magnetron2/output" 
     # froot = "%s%s_%s" %(fdir, fsplit[0], fsplit[1]) # used to be: %s/%s_%s" 
     froot= "%s/%s_%s/%s_%s" %(fdir_out, fsplit[0], fsplit[1], fsplit[0], fsplit[1])
     os.makedirs(os.path.dirname(froot), exist_ok=True)
@@ -121,11 +121,13 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
         try:
             # every minute the plots pop up showing the log(x), iterations, etc. 
             tsys.sleep(60)
-            logx_samples, p_samples = dnest4.postprocess(plot=False) 
-            if p_samples is None:
+            logz_estimate, H_estimate, logx_samples = dnest4.postprocess(plot=False)  
+            levels_info = np.loadtxt("%slevels.txt" %dnest_dir)
+            levels = len(levels_info)
+            if logx_samples is None or levels < 50 : # minimum of 50 levels 
                 endflag = False
             else:
-                endflag = find_weights(p_samples)
+                endflag = find_weights(logx_samples)
                 print("Endflag: " + str(endflag))
 
         except (KeyboardInterrupt, ValueError):
@@ -157,16 +159,17 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
     while endflag is False:
         try:
             tsys.sleep(120)
-            logx_samples, p_samples = dnest4.postprocess(plot=False) 
+            logz_estimate, H_estimate, logx_samples = dnest4.postprocess(plot=False) 
             samples = np.loadtxt("%sposterior_sample.txt"%dnest_dir)
             print("samples file: %ssample.txt" %dnest_dir)
-            print("nlevels: %i" %len(samples)) 
+            print("nsamples: %i" %len(samples)) 
             print("Endflag: " + str(endflag))
 
             if len(samples) >= nsims and len(np.shape(samples)) > 1: 
                 endflag = True
             else:
                 endflag = False
+
         except (KeyboardInterrupt, ValueError):
             break
 
@@ -182,9 +185,8 @@ def run_burst(filename, dnest_dir = "./", levelfilename=None, nsims=100):
         shutil.move("sample_info.txt", "%s_sample_info.txt" %froot)
         shutil.move("sample.txt", "%s_sample.txt" %froot)
         shutil.move("weights.txt", "%s_weights.txt" %froot)
-        shutil.move("log_prior_weights.txt", "%s_log_prior_weights.txt" %froot) # added 
-        shutil.move("main", "%s_main" %froot) # added 
-        # shutil.move("sampler_state.txt", "%s_sampler_state.txt" %froot) # added 
+        shutil.move("log_prior_weights.txt", "%s_log_prior_weights.txt" %froot)
+        shutil.move("main", "%s_main" %froot) 
 
     except IOError:
         print("No file posterior_sample.txt")
