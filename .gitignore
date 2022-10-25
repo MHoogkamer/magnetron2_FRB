@@ -1,1 +1,8 @@
 output/
+scratchpad/
+
+# FRB data 
+data/M81*
+data/B*
+data/FRB* 
+data/test_levels.dat
