@@ -22,7 +22,9 @@ MyModel::MyModel()
 
 void MyModel::calculate_mu()
 {
-        const vector<double>& t = data.get_t();
+        // const vector<double>& t = data.get_t();
+        const vector<double>& t_left = data.get_t_left();
+        const vector<double>& t_right = data.get_t_right();
 
         // Update or from scratch?
         bool update = (bursts.get_added().size() < bursts.get_components().size());
@@ -36,28 +38,58 @@ void MyModel::calculate_mu()
                 mu.assign(mu.size(), background);
 
         double amplitude, skew, tc;
-        double rise;
-        double tpar;
-        double cdf, pdf;
-        double erf_inner, pdf_fac;
+        double rise, fall;
+        // double tpar;
+        // double cdf, pdf;
+        // double erf_inner, pdf_fac;
 
         for(size_t j=0; j<components.size(); j++)
         {
-                tc = components[j][0];
+                tc = components[j][0]; 
                 amplitude = components[j][1];
-                rise = components[j][2];
+                rise = components[j][2]; 
                 skew = components[j][3];
 
+                fall = rise*skew; 
 
                 for(size_t i=0; i<mu.size(); i++)
                 {
-                        
-                        tpar = (t[i] - tc); 
-                        erf_inner = skew * (tpar/rise) / sqrt(2);
-                        cdf = 0.5 * (1.0 + gsl_sf_erf(erf_inner));
-                        pdf_fac = 1.0 / (rise * pow(2*M_PI, 0.5));
-                        pdf = pdf_fac * exp(-pow(tpar, 2) / (2*pow(rise, 2)));
-                        mu[i] += amplitude * 2 * pdf * cdf;
+                        // skewnormal 
+                        // tpar = (t[i] - tc); 
+                        // erf_inner = skew * (tpar/rise) / sqrt(2);
+                        // cdf = 0.5 * (1.0 + gsl_sf_erf(erf_inner));
+                        // pdf_fac = 1.0 / (rise * pow(2*M_PI, 0.5));
+                        // pdf = pdf_fac * exp(-pow(tpar, 2) / (2*pow(rise, 2)));
+                        // mu[i] += amplitude * 2 * pdf * cdf;
+
+                        // FRED 
+                        if(tc <= t_left[i])
+                        {
+                                // Bin to the right of peak
+                                mu[i] += amplitude*fall/data.get_dt()*
+                                                (exp((tc - t_left[i])/fall) -
+                                                 exp((tc - t_right[i])/fall));
+                        }
+                        else if(tc >= t_right[i])
+                        {
+                                // Bin to the left of peak
+                                mu[i] += -amplitude*rise/data.get_dt()*
+                                                (exp((t_left[i] - tc)/rise) -
+                                                 exp((t_right[i] - tc)/rise));
+                        }
+                        else
+                        {
+                                // Part to the left
+                                mu[i] += -amplitude*rise/data.get_dt()*
+                                                (exp((t_left[i] - tc)/rise) -
+                                                 1.);
+
+                                // Part to the right
+                                mu[i] += amplitude*fall/data.get_dt()*
+                                                (1. -
+                                                 exp((tc - t_right[i])/fall));
+
+                        }
 
                 }
 
