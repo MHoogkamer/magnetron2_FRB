@@ -8,7 +8,7 @@ import os
 
 import dnest4
 
-def rewrite_main(filename, dnest_dir = "./"):
+def rewrite_main(filename, dnest_dir = "./", fname=""):
     '''Rewrite the main.cpp to include
     the correct path to the filename'''
 
@@ -21,18 +21,18 @@ def rewrite_main(filename, dnest_dir = "./"):
 
     mfile.close()
 
-    mwrite_file = open(dnest_dir+"main.cpp.tmp", "w")
+    mwrite_file = open(dnest_dir+fname+"_main.cpp.tmp", "w")
 
     for l in mdata:
         mwrite_file.write(l)
 
     mwrite_file.close()
 
-    shutil.move(dnest_dir+"main.cpp.tmp", dnest_dir+"main.cpp")
+    shutil.move(dnest_dir+fname+"_main.cpp.tmp", dnest_dir+fname+"_main.cpp")
 
     return
 
-def rewrite_options(nlevels=300, dnest_dir="./", output_path ="./"):
+def rewrite_options(nlevels=300, dnest_dir="./", output_path ="./", fname=""):
 
     mfile = open(dnest_dir+"OPTIONS", "r")
     mdata = mfile.readlines()
@@ -41,24 +41,44 @@ def rewrite_options(nlevels=300, dnest_dir="./", output_path ="./"):
     mdata[-5] = '%i\t# maximum number of levels\n'%nlevels
     mdata[-1] = output_path
 
-    mwrite_file = open(dnest_dir+"OPTIONS.tmp", "w")
+    mwrite_file = open(dnest_dir+fname+"_OPTIONS.tmp", "w")
 
     for l in mdata:
         mwrite_file.write(l)
 
     mwrite_file.close()
 
-    shutil.move(dnest_dir+"OPTIONS.tmp", dnest_dir+"OPTIONS")
+    shutil.move(dnest_dir+fname+"_OPTIONS.tmp", dnest_dir+fname+"_OPTIONS")
 
     return
 
+def rewrite_makefile(dnest_dir, fname):
+    mfile = open(dnest_dir+"Makefile", "r")
+    mdata = mfile.readlines()
+    mfile.close()
 
-def remake_model(dnest_dir="./"):
+    ## replace filename in appropriate line:
+    mdata[8] = '\tg++ -L$(DNEST4_PATH)/DNest4/code -o ' + fname + '_main MyConditionalPrior.o Data.o MyModel.o ' + fname + '_main.o $(LIBS)\n'
+
+    mfile.close()
+
+    mwrite_file = open(dnest_dir+fname+"_Makefile.tmp", "w")
+
+    for l in mdata:
+        mwrite_file.write(l)
+
+    mwrite_file.close()
+
+    shutil.move(dnest_dir+fname+"_Makefile.tmp", dnest_dir+fname+"_Makefile")
+
+    return
+
+def remake_model(dnest_dir="./", fname=""):
     ''' Runs make '''
-    tstart = tsys.process_time() # changed from clock to process_time
-    subprocess.call(["make", "-C", dnest_dir])
+    tstart = tsys.process_time() 
+    subprocess.call(["make", "-C", dnest_dir, "-f", fname+"_Makefile"])
     tsys.sleep(15)
-    tend = tsys.process_time() # changed from clock to process_time
+    tend = tsys.process_time() 
 
     return
 
@@ -76,7 +96,7 @@ def find_weights(p_samples):
         print("Returning False")
         return False
 
-def run_burst(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=None, nsims=100, min_nlevels=50): 
+def main(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=None, nsims=100, min_nlevels=50): 
     '''' Automatically runs the DNest4 for the given filename without having
     to put the correct commands in the command line. Also finds the correct 
     amount of levels by running DNest4 twice. 
@@ -109,14 +129,15 @@ def run_burst(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=
     ### first DNest4 run: set levels to 300
     # automatically recompile and set the options file  
     print("Rewriting DNest run file (main.cpp)")
-    rewrite_main(filename, dnest_dir)
-    rewrite_options(nlevels=300, dnest_dir=dnest_dir, output_path=output_path) 
-    remake_model(dnest_dir)
+    rewrite_main(filename, dnest_dir, fname)
+    rewrite_options(nlevels=300, dnest_dir=dnest_dir, output_path=output_path, fname=fname) 
+    rewrite_makefile(dnest_dir, fname)
+    remake_model(dnest_dir, fname)
 
     print("First run of DNest: Find number of levels")
     # run a program with modified scheduling priority of -19 (using nice).
     # niceness values range from -20 (most favorable to the process) to 19 (least favorable to the process).
-    dnest_process = subprocess.Popen(["nice", "-19", "./main", "-t", "8"])
+    dnest_process = subprocess.Popen(["nice", "-19", "./%s_main"%fname, "-t", "8"])
 
     # endflag marks when DNest4 has to stop running 
     endflag = False
@@ -139,7 +160,7 @@ def run_burst(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=
     # if the endflag is true print it 
     print("endflag: " + str(endflag))
 
-    # Kill DNest4 when endflag is true: when weights are found 
+    # kill DNest4 when endflag is true: when weights are found 
     dnest_process.kill()
 
     dnest_data = np.loadtxt("%ssample.txt" %output_path)
@@ -151,12 +172,12 @@ def run_burst(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=
         levelfile.write("%s \t %i \n" %(filename, nlevels))
         levelfile.close()
 
-    # Rerun DNest4 again, but now with the correct amount of levels calculated previously
-    # In order to do that rewrite the options file and recompile
-    rewrite_options(nlevels=nlevels, dnest_dir=dnest_dir, output_path=output_path)
-    remake_model(dnest_dir)
+    # rerun DNest4 again, but now with the correct amount of levels calculated previously
+    # in order to do that rewrite the options file and recompile
+    rewrite_options(nlevels=nlevels, dnest_dir=dnest_dir, output_path=output_path, fname=fname)
+    remake_model(dnest_dir, fname)
 
-    dnest_process = subprocess.Popen(["nice", "-19", "./main", "-t", "8"])
+    dnest_process = subprocess.Popen(["nice", "-19", "./%s_main"%fname, "-t", "8"])
 
     endflag = False
     while endflag is False:
@@ -178,19 +199,24 @@ def run_burst(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=
 
     print("Endflag: " + str(endflag))
 
-    # Kill DNest4 when endflag is true: 
+    # kill DNest4 when endflag is true: 
     # when minimum amount of samples for the set amount of levels is reached 
     dnest_process.kill()
 
-    # Change the outputfilenames so that it includes the filename
     try:
+        # change the outputfilenames so that it includes the filename
         shutil.move("%sposterior_sample.txt" %output_path, "%s_posterior_sample.txt" %froot) 
         shutil.move("%slevels.txt" %output_path, "%s_levels.txt" %froot)
         shutil.move("%ssample_info.txt" %output_path, "%s_sample_info.txt" %froot)
         shutil.move("%ssample.txt" %output_path, "%s_sample.txt" %froot)
         shutil.move("%sweights.txt" %output_path, "%s_weights.txt" %froot)
         shutil.move("%slog_prior_weights.txt" %output_path, "%s_log_prior_weights.txt" %froot)
-        shutil.move("main", "%s_main" %froot)  # main is still not created in the output folder 
+
+        # remove unnecessary files  
+        os.remove("%s_main" %fname)
+        os.remove("%s_main.cpp" %fname)
+        os.remove("%s_Makefile" %fname)
+        os.remove("%s_OPTIONS" %fname)
 
     except IOError:
         print("No file posterior_sample.txt")
