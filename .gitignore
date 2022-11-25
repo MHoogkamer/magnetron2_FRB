@@ -1,9 +1,12 @@
 output/
 output_old/
 scratchpad/
+code/run_dnest_II.py
+code/MyConditionalPrior_II.cpp
 
 # FRB data 
 data/M81*
 data/B*
 data/FRB* 
 data/test_levels.dat
+data_all

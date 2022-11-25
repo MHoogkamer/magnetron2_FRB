@@ -52,7 +52,7 @@ def rewrite_options(nlevels=300, dnest_dir="./", output_path ="./", fname=""):
 
     return
 
-def rewrite_makefile(dnest_dir, fname):
+def rewrite_makefile(dnest_dir="./", fname=""):
     mfile = open(dnest_dir+"Makefile", "r")
     mdata = mfile.readlines()
     mfile.close()
@@ -89,6 +89,7 @@ def find_weights(p_samples):
 
     ### NOTE: logx_samples runs from 0 to -120, but I'm interested in the values of p_samples near the
     ### smallest values of X, so I need to look at the end of the list
+    
     if np.max(p_samples[-10:]) < 1.0e-5:
         print("Returning True")
         return True
@@ -96,8 +97,8 @@ def find_weights(p_samples):
         print("Returning False")
         return False
 
-def main(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=None, nsims=100, min_nlevels=50): 
-    '''' Automatically runs the DNest4 for the given filename without having
+def run_burst(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=None, nsims=100, min_nlevels=50): 
+    '''Automatically runs the DNest4 for the given filename without having
     to put the correct commands in the command line. Also finds the correct 
     amount of levels by running DNest4 twice. 
 
@@ -143,7 +144,7 @@ def main(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=None,
     endflag = False
     while endflag is False:
         try:
-            tsys.sleep(60)
+            tsys.sleep(60) 
             logz_estimate, H_estimate, logx_samples = dnest4.postprocess(plot=False, output_path=output_path)  
             levels_info = np.loadtxt("%slevels.txt" %output_path) 
             levels = len(levels_info)
@@ -182,7 +183,7 @@ def main(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=None,
     endflag = False
     while endflag is False:
         try:
-            tsys.sleep(120)
+            tsys.sleep(120) 
             logz_estimate, H_estimate, logx_samples = dnest4.postprocess(plot=False, output_path=output_path) 
             samples = np.loadtxt("%sposterior_sample.txt"%output_path)
             print("samples file: %ssample.txt" %output_path)
@@ -223,14 +224,14 @@ def main(filename, dnest_dir = "./", fdir_out = "../output", levelfilename=None,
 
     return
 
-def run_all_bursts(data_dir="../data/", dnest_dir="./", fdir_out = "../output", levelfilename="test_levels.dat"):
+def run_all_bursts(data_dir, dnest_dir, fdir_out, levelfilename):
 
     print("I am in run_all_bursts")
     # Run all the burst by running all the files that end with .dat
-    filenames = glob.glob("%s*.dat"%data_dir) 
+    filenames = glob.glob("%s*.dat"%data_dir)
     print("Filenames:", filenames)
 
-    levelfilename = data_dir+levelfilename
+    levelfilename = fdir_out+"/"+levelfilename
     print("Saving levels in file %s"%levelfilename)
 
     levelfile = open(levelfilename, "w")
@@ -239,15 +240,9 @@ def run_all_bursts(data_dir="../data/", dnest_dir="./", fdir_out = "../output", 
 
     for f in filenames:
         print("Running on burst %s" %f)
-        run_burst(f, dnest_dir=dnest_dir, fdir_out=fdir_out, levelfilename=levelfilename) 
+        run_burst(f, dnest_dir, fdir_out, levelfilename) 
 
     return
-
-def main():
-    print("I am in main")
-    run_all_bursts(data_dir, dnest_dir, fdir_out, levelfilename)
-    return
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Running DNest on a number of bursts")
@@ -268,10 +263,10 @@ if __name__ == "__main__":
     dnest_dir = clargs.dnest_dir
     fdir_out = clargs.fdir_out
     levelfilename = clargs.filename
-
-    main()
+    
+    run_all_bursts(data_dir, dnest_dir, fdir_out, levelfilename)
 
 # if __name__ == "__main__":
 #     parser = argparse.ArgumentParser(description="Running DNest on a single burst")
 
-#     main(filename = "/home/mariska/UvA/magnetron2/data/B16_Jan14_profile2.dat")
+#     run_burst(filename = "/home/mariska/UvA/magnetron2/data/B3_Jan14_test.dat")
