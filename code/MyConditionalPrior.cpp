@@ -54,7 +54,7 @@ double MyConditionalPrior::perturb_hyperparameters(RNG& rng)
 	if(which == 2)
 	{
 		sig_widths += 2.*rng.randh();
-		sig_widths = mod(sig, 2.);
+		sig_widths = mod(sig_widths, 2.);
 	}
         if(which == 3)
 	{
@@ -99,7 +99,7 @@ void MyConditionalPrior::to_uniform(std::vector<double>& vec) const // CDF
 void MyConditionalPrior::print(std::ostream& out) const
 {
 //	out<<mu<<' '<<mu_widths<<' '<<a<<' '<<b<<' ';
-	out<<mu<<' '<<sig<<' '<<mu_widths<<' '<<sig_widths<<' '<<a<<' '<<b<<' ';
+	out<<mu<<' '<<mu_widths<<' '<<sig_widths<<' '<<a<<' '<<b<<' ';
 
 }
 
