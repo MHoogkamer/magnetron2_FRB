@@ -11,11 +11,11 @@ class MyConditionalPrior:public DNest4::ConditionalPrior
 		double mu_min, mu_max;
 		double min_width;
 
-		// Mean of amplitudes and widths
+		// Mean of amplitudes and risetime
 		double mu, mu_widths;
 
-        // sigma for log(amplitude) and log(width)
-		double sig_widths;
+        // sigma for log(amplitude) and log(width)/log(risetime)
+		double sig, sig_widths;
 
 		// Uniform for log-skews
 		double a, b; // Midpoint and half-width
