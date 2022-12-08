@@ -1,4 +1,7 @@
 output/
+scratchpad/
+<<<<<<< Updated upstream
+code/run_dnest_II.py
 output_old/
 scratchpad/
 code/run_dnest_II.py
@@ -10,3 +13,6 @@ data/B*
 data/FRB* 
 data/test_levels.dat
 data_all
+=======
+code/run_dnest_II.py
+>>>>>>> Stashed changes
