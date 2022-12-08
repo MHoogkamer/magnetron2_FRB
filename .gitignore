@@ -1,11 +1,8 @@
 output/
 scratchpad/
-<<<<<<< Updated upstream
-code/run_dnest_II.py
-output_old/
-scratchpad/
-code/run_dnest_II.py
+
 code/MyConditionalPrior_II.cpp
+code/main
 
 # FRB data 
 data/M81*
@@ -13,6 +10,3 @@ data/B*
 data/FRB* 
 data/test_levels.dat
 data_all
-=======
-code/run_dnest_II.py
->>>>>>> Stashed changes
