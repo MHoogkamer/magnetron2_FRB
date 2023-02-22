@@ -22,9 +22,9 @@ MyModel::MyModel()
 
 void MyModel::calculate_mu()
 {
-        // const vector<double>& t = data.get_t();
-        const vector<double>& t_left = data.get_t_left();
-        const vector<double>& t_right = data.get_t_right();
+        const vector<double>& t = data.get_t();
+        // const vector<double>& t_left = data.get_t_left();
+        // const vector<double>& t_right = data.get_t_right();
 
         // Update or from scratch?
         bool update = (bursts.get_added().size() < bursts.get_components().size());
@@ -38,8 +38,8 @@ void MyModel::calculate_mu()
                 mu.assign(mu.size(), background);
 
         double amplitude, skew, tc;
-        double rise, fall;
-        // double tpar;
+        double rise; // fall;
+        double tpar;
         // double cdf, pdf;
         // double erf_inner, pdf_fac;
 
@@ -50,7 +50,7 @@ void MyModel::calculate_mu()
                 rise = components[j][2]; 
                 skew = components[j][3];
 
-                fall = rise*skew; 
+                // fall = rise*skew; 
 
                 for(size_t i=0; i<mu.size(); i++)
                 {
@@ -63,33 +63,38 @@ void MyModel::calculate_mu()
                         // mu[i] += amplitude * 2 * pdf * cdf;
 
                         // FRED 
-                        if(tc <= t_left[i])
+                        tpar = (t[i] - tc) / rise; 
+
+                        // if(tc <= t_left[i])
+                        if(tc <= t[i])
                         {
                                 // Bin to the right of peak
-                                mu[i] += amplitude*fall/data.get_dt()*
-                                                (exp((tc - t_left[i])/fall) -
-                                                 exp((tc - t_right[i])/fall));
+                                // mu[i] += amplitude*fall/data.get_dt()*
+                                //                 (exp((tc - t_left[i])/fall) -
+                                //                  exp((tc - t_right[i])/fall));
+                                mu[i] += amplitude*exp(-tpar / skew);
                         }
-                        else if(tc >= t_right[i])
+                        else // if(tc >= t_right[i])
                         {
                                 // Bin to the left of peak
-                                mu[i] += -amplitude*rise/data.get_dt()*
-                                                (exp((t_left[i] - tc)/rise) -
-                                                 exp((t_right[i] - tc)/rise));
+                                // mu[i] += -amplitude*rise/data.get_dt()*
+                                //                 (exp((t_left[i] - tc)/rise) -
+                                //                  exp((t_right[i] - tc)/rise));
+                                mu[i] += amplitude*exp(tpar);
                         }
-                        else
-                        {
-                                // Part to the left
-                                mu[i] += -amplitude*rise/data.get_dt()*
-                                                (exp((t_left[i] - tc)/rise) -
-                                                 1.);
+                        // else
+                        // {
+                        //         // Part to the left
+                        //         mu[i] += -amplitude*rise/data.get_dt()*
+                        //                         (exp((t_left[i] - tc)/rise) -
+                        //                          1.);
 
-                                // Part to the right
-                                mu[i] += amplitude*fall/data.get_dt()*
-                                                (1. -
-                                                 exp((tc - t_right[i])/fall));
+                        //         // Part to the right
+                        //         mu[i] += amplitude*fall/data.get_dt()*
+                        //                         (1. -
+                        //                          exp((tc - t_right[i])/fall));
 
-                        }
+                        // }
 
                 }
 
