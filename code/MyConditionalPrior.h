@@ -9,7 +9,7 @@ class MyConditionalPrior:public DNest4::ConditionalPrior
 		// Limits
 		double x_min, x_max;
 		double mu_min, mu_max;
-		double min_width;
+		double min_width, max_width;
 
 		// Mean of amplitudes and risetime
 		double mu, mu_widths;
