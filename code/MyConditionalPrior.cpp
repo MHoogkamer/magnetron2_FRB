@@ -21,7 +21,7 @@ void MyConditionalPrior::from_prior(RNG& rng)
 {
 	mu = tan(M_PI*(0.97*rng.rand() - 0.485)); // mean amplitude 
 	mu = exp(mu);
-	mu_widths = exp(log(0.1*983E-6) + log(10*983E-6)*rng.rand()); // mean risetime hardcoded with CHIME time resolution 983 us
+	mu_widths = exp(log(0.1*0.983) + log(10*0.983)*rng.rand()); // mean risetime hardcoded with CHIME time resolution 983 us (CHIME data is in ms)
 
 	sig = 2.*rng.rand(); // width amplitude
 	sig_widths = 2.*rng.rand(); // width risetime
@@ -48,9 +48,9 @@ double MyConditionalPrior::perturb_hyperparameters(RNG& rng)
 	if(which == 1)
 	{
 		mu_widths = log(mu_widths/(x_max - x_min));
-		mu_widths += log(10*983E-6)*pow(10., 1.5 - 6.*rng.rand())*rng.randn(); // hardcoded time resolution
+		mu_widths += log(10*0.983)*pow(10., 1.5 - 6.*rng.rand())*rng.randn(); // hardcoded time resolution
 		mu_widths = mod(mu_widths - log(0.1), log(10)) + log(0.1); 
-		mu_widths = (983E-6)*exp(mu_widths); // hardcoded time resolution
+		mu_widths = (0.983)*exp(mu_widths); // hardcoded time resolution
 	}
 	if(which == 2)
 	{

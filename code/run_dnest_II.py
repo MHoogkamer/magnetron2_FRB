@@ -37,7 +37,7 @@ def find_weights(p_samples):
     print(f"Max p_sample value: {p_sample_max}")
     return p_sample_max < 1.0e-5
 
-def run_burst(filename, dnest_dir, fdir_out, levelfilename=None, nsims=200, min_nlevels=250):  
+def run_burst(filename, dnest_dir, fdir_out, levelfilename=None, nsims=200, min_nlevels=50):  
     print("Running new burst")
     # splits up the path to the file into the directory and the filename
     path = filename.split("/")
@@ -136,8 +136,9 @@ def run_all_bursts(data_dir, dnest_dir, fdir_out, levelfilename):
     levelfilename = f"{fdir_out}/{levelfilename}"
     print("Saving levels in file", levelfilename)
 
-    with open(levelfilename, 'w') as levelfile:
-        levelfile.write("# data filename \t number of levels \n")
+    if levelfilename is None: 
+        with open(levelfilename, 'a') as levelfile:
+            levelfile.write("# data filename \t number of levels \n")
 
     # Run all the burst by running all the files that end with .dat
     filenames = glob.glob(f"{data_dir}*.dat")
