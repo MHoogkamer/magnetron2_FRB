@@ -13,7 +13,7 @@ const Data& MyModel::data = Data::get_instance();
 
 MyModel::MyModel()
 :bursts(4, 100, false, MyConditionalPrior(data.get_t_min(), data.get_t_max(),
-                1E-10, 150.0))
+                1E-10, 250.0))
 //,noise_normals(data.get_t().size())
 ,mu(data.get_t().size())
 {
