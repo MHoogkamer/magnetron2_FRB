@@ -2,6 +2,7 @@
 #define _MyModel_
 
 #include "DNest4/code/RNG.h"
+#include "DNest4/code/DNest4.h"
 #include "MyConditionalPrior.h"
 #include <ostream>
 #include "Data.h"
@@ -20,12 +21,15 @@ class MyModel
 		// The bursts
 		DNest4::RJObject<MyConditionalPrior> bursts;
 		
-		// Extra white noise on teh Poisson rate
+		// Extra white noise on the Poisson rate
 		std::vector<double> noise_normals;
 		double noise_sigma, noise_L;
 
 		// Poisson mean
 		std::vector<long double> mu;
+
+                // noise process vector
+                std::vector<long double> ynoise;
 
 		// Calculate mu from scratch:
 		void calculate_mu();
