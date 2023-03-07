@@ -2,6 +2,7 @@
 #define _MyConditionalPrior_
 
 #include "DNest4/code/RJObject/ConditionalPriors/ConditionalPrior.h"
+#include "DNest4/code/DNest4.h"
 
 class MyConditionalPrior:public DNest4::ConditionalPrior
 {
