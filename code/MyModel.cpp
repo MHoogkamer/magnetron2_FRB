@@ -17,7 +17,7 @@ const DNest4::Cauchy MyModel::cauchy(0.0, 1.0);
 MyModel::MyModel()
 :bursts(4, 100, false, MyConditionalPrior(data.get_t_min(), data.get_t_max(),
                 1E-10, 250.0))
-//,noise_normals(data.get_t().size())
+,noise_normals(data.get_t().size())
 ,mu(data.get_t().size())
 {
 

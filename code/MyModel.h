@@ -17,6 +17,9 @@ class MyModel
 
 		// A flat background level
 		double background;
+
+                // A useful cauchy distribution
+                static const DNest4::Cauchy cauchy;
  
 		// The bursts
 		DNest4::RJObject<MyConditionalPrior> bursts;
