@@ -2,6 +2,7 @@
 #define _MyModel_
 
 #include "DNest4/code/RNG.h"
+#include "DNest4/code/DNest4.h"
 #include "MyConditionalPrior.h"
 #include <ostream>
 #include "Data.h"
@@ -16,17 +17,22 @@ class MyModel
 
 		// A flat background level
 		double background;
+
+                // A useful cauchy distribution
+                static const DNest4::Cauchy cauchy;
  
 		// The bursts
-//		DNest4::RJObject<MyConditionalPrior> bursts;
 		DNest4::RJObject<MyConditionalPrior> bursts;
 		
-		// Extra white noise on teh Poisson rate
-//		std::vector<double> noise_normals;
-//		double noise_sigma, noise_L;
+		// Extra white noise on the Poisson rate
+		std::vector<double> noise_normals;
+		double noise_sigma, noise_L;
 
 		// Poisson mean
 		std::vector<long double> mu;
+
+                // noise process vector
+                std::vector<long double> ynoise;
 
 		// Calculate mu from scratch:
 		void calculate_mu();

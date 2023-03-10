@@ -2,6 +2,7 @@
 #define _MyConditionalPrior_
 
 #include "DNest4/code/RJObject/ConditionalPriors/ConditionalPrior.h"
+#include "DNest4/code/DNest4.h"
 
 class MyConditionalPrior:public DNest4::ConditionalPrior
 {
@@ -9,12 +10,12 @@ class MyConditionalPrior:public DNest4::ConditionalPrior
 		// Limits
 		double x_min, x_max;
 		double mu_min, mu_max;
-		double min_width;
+		double min_width, max_width;
 
-		// Mean of amplitudes and widths
+		// Mean of amplitudes and risetime
 		double mu, mu_widths;
 
-                // sigma for log(amplitude) and log(width)
+        // sigma for log(amplitude) and log(width)/log(risetime)
 		double sig, sig_widths;
 
 		// Uniform for log-skews
