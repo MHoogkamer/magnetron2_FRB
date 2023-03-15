@@ -119,14 +119,20 @@ def run_burst(filename, dnest_dir, fdir_out, levelfilename=None, nsims=200, min_
     try:
         # change the output filenames so that it includes the filename
         shutil.move(f"{output_path}posterior_sample.txt", f"{froot}_posterior_sample.txt") 
-        shutil.move(f"{output_path}levels.txt", f"{froot}_levels.txt")
-        shutil.move(f"{output_path}sample_info.txt", f"{froot}_sample_info.txt")
-        shutil.move(f"{output_path}sample.txt", f"{froot}_sample.txt")
-        shutil.move(f"{output_path}weights.txt", f"{froot}_weights.txt")
-        shutil.move(f"{output_path}log_prior_weights.txt", f"{froot}_log_prior_weights.txt")
+        # shutil.move(f"{output_path}levels.txt", f"{froot}_levels.txt")
+        # shutil.move(f"{output_path}sample_info.txt", f"{froot}_sample_info.txt")
+        # shutil.move(f"{output_path}sample.txt", f"{froot}_sample.txt")
+        # shutil.move(f"{output_path}weights.txt", f"{froot}_weights.txt")
+        # shutil.move(f"{output_path}log_prior_weights.txt", f"{froot}_log_prior_weights.txt")
 
         # remove unnecessary files  
         os.remove(f"{fname}_OPTIONS")
+        os.remove(f"{output_path}levels.txt")
+        os.remove(f"{output_path}sample_info.txt")
+        os.remove(f"{output_path}sample.txt")
+        os.remove(f"{output_path}weights.txt")
+        os.remove(f"{output_path}log_prior_weights.txt")
+
 
     except IOError:
         print("No file posterior_sample.txt")

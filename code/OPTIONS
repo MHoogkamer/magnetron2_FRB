@@ -7,5 +7,5 @@
 300	    # maximum number of levels
 1       # Backtracking scale length (lambda in the paper)
 100     # Strength of effect to force histogram to equal push. 0-10 is best. (beta in the paper)
-2500  # Maximum number of saves (0 = infinite)
+5000  # Maximum number of saves (0 = infinite)
 /home/mariska/UvA/magnetron2/output/B16_Jan14/
